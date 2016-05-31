@@ -1,0 +1,81 @@
+#读取数据
+algae<-read.table("C:/Users/AAA/Desktop/Analysis.txt",,col.names=c('season','size','speed','max_PH','min_O2','avr_Cl','avr_NO3','avr_NH4','avr_oPO4','avr_PO4','avr_Chla','a1','a2','a3','a4','a5','a6','a7'),na.strings=c('XXXXXXX'))
+
+#获取数据描述性统计摘要：
+summary(data)
+
+#绘制直方图，
+par(mfrow=c(2,4))
+hist(algae$max_PH,probability=T) 
+hist(algae$min_O2,probability=T) 
+hist(algae$avr_Cl,probability=T) 
+hist(algae$avr_NO3,probability=T) 
+hist(algae$avr_NH4,probability=T) 
+hist(algae$avr_oPO4,probability=T) 
+hist(algae$avr_PO4,probability=T) 
+hist(algae$avr_Chla,probability=T)
+
+#用qq图检验其分布是否为正态分布
+par(mfrow=c(2,4))
+qqPlot(algae$max_PH, main='QQplot of max_PH') 
+qqPlot(algae$min_O2, main='QQplot of min_O2') 
+qqPlot(algae$avr_Cl, main='QQplot of avr_Cl') 
+qqPlot(algae$avr_NO3, main='QQplot of avr_NO3') 
+qqPlot(algae$avr_NH4, main='QQplot of avr_NH4') 
+qqPlot(algae$avr_oPO4, main='QQplot of avr_oPO4') 
+qqPlot(algae$avr_PO4, main='QQplot of avr_PO4') 
+qqPlot(algae$avr_Chla, main='QQplot of avr_Chla')
+
+#盒图
+par(mfrow=c(2,4))
+boxplot(algae$max_PH,ylab="max_PH")
+boxplot(algae$min_O2,ylab="min_O2")
+boxplot(algae$avr_Cl,ylab="avr_Cl")
+boxplot(algae$avr_NO3,ylab="avr_NO3")
+boxplot(algae$avr_NH4,ylab="avr_NH4")
+boxplot( algae$avr_oPO4,ylab="avr_oPO4")
+boxplot(algae$avr_PO4,ylab="avr_PO4")
+boxplot(algae$avr_Chla,ylab="avr_Chla")
+
+#条件盒图
+bwplot(size~a1,data= algae,ylab = 'Y',xlab='X')
+bwplot(size~a2,data= algae,ylab = 'Y',xlab='X')
+bwplot(size~a3,data= algae,ylab = 'Y',xlab='X')
+bwplot(size~a4,data= algae,ylab = 'Y',xlab='X')
+bwplot(size~a4,data= algae,ylab = 'Y',xlab='X')
+bwplot(size~a5,data= algae,ylab = 'Y',xlab='X')
+bwplot(size~a6,data= algae,ylab = 'Y',xlab='X')
+bwplot(size~a7,data= algae,ylab = 'Y',xlab='X')
+
+#列表显示缺失
+library(mice)
+md.pattern(algae)
+
+#图形探究缺失数据
+aggr(algae,prop=FALSE,numbers=TRUE)
+
+#剔除缺失值
+algae_new<-na.omit(algae)
+
+
+#最高频率值填补
+algae[48, "max_PH"] <- mean(algae$max_PH, na.rm = T)
+algae <- centralImputation(algae)
+
+#属性的相关关系来填补缺失值
+cor(algae[,4:18], use = "complete.obs")
+symnum(cor(algae[,4:18], use = "complete.obs"))
+algae_new<-algae[-manyNAs(algae)]
+lm(avr_oPO4~avr_PO4, data=algae_new)
+algae_new[28, "avr_PO4"] <- 42.897 + 1.293 * algae_new[28, "avr_oPO4"]
+algae_new<-algae[-manyNAs(algae_new),]
+fillavr_PO4<-function(avr_oPO4){
++ if(is.na(avr_oPO4))
++ return(NA)
++ else return(42.897+1.293*avr_oPO4)
++ }
+algae_new[is.na(algae_new$avr_PO4),"avr_PO4"]<-sapply(algae_new[is.na(algae_new$avr_PO4), "avr_oPO4"],fillavr_PO4)
+
+#案例相似性填补
+algae_new<-algae[-manyNAs(algae),]
+algage<-knnImputation(algae_new,k=10,meth="median")
