@@ -14,4 +14,9 @@
 2. 将能量波形进行聚类分析，分成8类
 3. 任取一类中的数据，同时进行0~255秘钥猜测，计算出第一轮异或值
 4. 在同一类中，异或值差异最小的即可确定Key!即为真值
+![](https://github.com/Darkmoon123/DM/blob/master/Sakura%E6%9D%BF%E8%BF%9E%E6%8E%A5%E5%9B%BE2.jpg)
+
 ![](https://github.com/Darkmoon123/DM/blob/master/%E7%A4%BA%E6%B3%A2%E5%99%A8+Sakura%E6%9D%BF%E5%AD%90.jpg)
+
+![](https://github.com/Darkmoon123/DM/blob/master/%E5%8E%9F%E5%A7%8B%E6%B3%A2.jpg)
+
